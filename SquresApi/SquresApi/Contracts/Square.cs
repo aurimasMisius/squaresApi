@@ -4,6 +4,6 @@ namespace SquaresApi.Contracts
 {
     public class Square
     {
-        List<Point> Points { get; set; }
+        public List<Point> Points { get; set; }
     }
 }

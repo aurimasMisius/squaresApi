@@ -7,8 +7,8 @@ namespace Services
     public interface IPointsService
     {
         public Guid AddNewList(List<Point> points);
-        public void AddPoint(int listId);
-        public void RemovePoint(int listId);
-        public List<Point> GetPoints(int listId);
+        public void AddPoint(Guid listId);
+        public void RemovePoint(Guid listId);
+        public List<Point> GetPoints(Guid listId);
     }
 }

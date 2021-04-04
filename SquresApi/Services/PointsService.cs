@@ -9,26 +9,50 @@ namespace Services
         public PointsService()
         {
         }
-        
+
         public Guid AddNewList(List<Point> points)
         {
-            Guid id = new Guid();
-            return id;
-        }
-        
-        public void AddPoint(int listId)
-        {
-            List<Point> points = GetPoints(listId);
-        }
-        
-        public void RemovePoint(int listId)
-        {
-            List<Point> points = GetPoints(listId);
+            try
+            {
+                Guid id = new Guid();
+                //TODO: write to database
+                
+                return id;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public List<Point> GetPoints(int listId)
+        public void AddPoint(Guid listId)
+        {
+            try
+            {
+                //todo: update database with new point
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void RemovePoint(Guid listId)
+        {
+            try
+            {
+                //todo: uodate database removing point
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public List<Point> GetPoints(Guid listId)
         {
             List<Point> points = new();
+
             return points;
         }
     }

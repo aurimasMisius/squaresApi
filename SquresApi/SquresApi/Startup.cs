@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using Services;
 
 namespace SquaresApi
@@ -27,7 +28,14 @@ namespace SquaresApi
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SquresApi", Version = "v1" });
             });
 
+            IConfigurationSection mongoSection = Configuration.GetSection("Persistance:Mongo");
+            IConfigurationSection connectionStringSection = mongoSection.GetSection("ConnectionString");
+            IConfigurationSection databaseTitleSection = mongoSection.GetSection("DatabaseTitle");
+            MongoClientSettings clientSettings = MongoClientSettings.FromUrl(new MongoUrl(connectionStringSection.Value));
+            services.AddSingleton(new MongoClient(clientSettings).GetDatabase(databaseTitleSection.Value));
+
             services.AddTransient<IPointsService>(s => new PointsService());
+            services.AddTransient<ISquaresService>(s => new SquaresService());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
