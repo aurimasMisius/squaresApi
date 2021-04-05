@@ -7,6 +7,7 @@ namespace Mongo
     {
         public PointsRepository(IMongoDatabase database, string collectionName) : base(database, collectionName)
         {
+
         }
     }
 }
