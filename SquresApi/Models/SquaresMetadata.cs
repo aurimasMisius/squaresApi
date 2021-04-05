@@ -6,7 +6,7 @@ namespace Models
 {
     public class SquaresMetadata : BaseDocument
     {
-        public Guid Id { get; set; }
+        public int Count { get; set; }
         public List<Square> Squares { get; set; }
     }
 }

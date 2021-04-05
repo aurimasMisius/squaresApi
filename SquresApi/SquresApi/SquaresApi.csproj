@@ -7,9 +7,11 @@
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.12.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mongo\Mongo.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

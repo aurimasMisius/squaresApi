@@ -1,59 +1,61 @@
-﻿using System;
-using Models;
+﻿using Models;
+using Mongo;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Services
 {
     public class PointsService : IPointsService
     {
-        public PointsService()
+        private readonly PointsRepository _pointsRepository;
+
+        public PointsService(PointsRepository pointsRepository)
         {
+            _pointsRepository = pointsRepository;
         }
 
-        public Guid AddNewList(List<Point> points)
+        public async Task<Guid> AddNewList(List<Point> points)
         {
-            try
-            {
-                Guid id = new Guid();
-                //TODO: write to database
+            Guid id = Guid.NewGuid();
+            PointsMetadata pointsMetadata = CreateMetadata(id, points);
+            await _pointsRepository.Create(pointsMetadata).ConfigureAwait(false);
                 
-                return id;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return id;
         }
 
-        public void AddPoint(Guid listId)
+        public async Task AddPoint(Guid listId, Point point)
         {
-            try
-            {
-                //todo: update database with new point
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            PointsMetadata pointsMetadata = await _pointsRepository.Find(listId);
+            pointsMetadata.Points.Add(point);
+            await _pointsRepository.Update(pointsMetadata).ConfigureAwait(false);
         }
 
-        public void RemovePoint(Guid listId)
+        public async Task RemovePoint(Guid listId, Point point)
         {
-            try
+            PointsMetadata pointsMetadata = await _pointsRepository.Find(listId);
+            List<Point> pointsToRemove = pointsMetadata.Points.Where(x => x.X == point.X && x.Y == point.Y).ToList();
+            foreach (Point pointToRemove in pointsToRemove)
             {
-                //todo: uodate database removing point
+                pointsMetadata.Points.Remove(pointToRemove);
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            await _pointsRepository.Update(pointsMetadata).ConfigureAwait(false);
         }
 
-        public List<Point> GetPoints(Guid listId)
+        public async Task<List<Point>> GetPoints(Guid listId)
         {
-            List<Point> points = new();
+            PointsMetadata pointsMetadata = await _pointsRepository.Find(listId).ConfigureAwait(false);
+            return pointsMetadata.Points;
+        }
 
-            return points;
+        private PointsMetadata CreateMetadata(Guid id, List<Point> points)
+        {
+            return new PointsMetadata
+            {
+                Id = id,
+                Points = points
+            };
         }
     }
 }

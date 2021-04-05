@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services;
-using SquaresApi.Contracts;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Models;
+using Point = SquaresApi.Contracts.Point;
+using Square = SquaresApi.Contracts.Square;
 
 namespace SquaresApi.Controllers
 {
@@ -22,13 +25,11 @@ namespace SquaresApi.Controllers
         }
 
         [HttpGet("squares")]
-        public IEnumerable<Square> GetSquares(Guid listId)
+        public async Task<IEnumerable<Square>> GetSquares(Guid listId)
         {
             List<Square> squares = new();
-
-            List<Point> points = _pointsService.GetPoints(listId).Select(Map).ToList();
-            List<Models.Square> modelSquares = _squaresService.GetSquares(points.Select(Map).ToList());
-            squares.AddRange(modelSquares.Select(Map).ToList());
+            SquaresMetadata squaresMetadata = await _squaresService.GetSquares(listId).ConfigureAwait(false);
+            squares.AddRange(squaresMetadata.Squares.Select(Map).ToList());
 
             return squares;
         }

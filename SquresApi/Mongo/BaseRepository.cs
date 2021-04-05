@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Mongo
@@ -12,6 +13,7 @@ namespace Mongo
         {
             MongoCollectionSettings defaultSettings = new()
             {
+                GuidRepresentation = GuidRepresentation.Standard,
                 AssignIdOnInsert = false
             };
 

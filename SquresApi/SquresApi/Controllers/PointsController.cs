@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services;
 using SquaresApi.Contracts;
+using SquaresApi.Documentation;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace SquaresApi.Controllers
 {
@@ -13,30 +15,37 @@ namespace SquaresApi.Controllers
     public class PointsController : ControllerBase
     {
         private readonly IPointsService _pointsService;
+        private readonly ISquaresService _squaresService;
         private readonly ILogger<PointsController> _logger;
 
-        public PointsController(ILogger<PointsController> logger, IPointsService pointsService)
+        public PointsController(ILogger<PointsController> logger, IPointsService pointsService, ISquaresService squaresService)
         {
             _logger = logger;
             _pointsService = pointsService;
+            _squaresService = squaresService;
         }
 
         [HttpPut("points")]
-        public Task<Guid> AddPointsList([FromBody] List<Point> points)
+        [SwaggerRequestExample(typeof(List<Point>), typeof(PointListExample))]
+        public async Task<Guid> AddPointsList([FromBody] List<Point> points)
         {
             List<Models.Point> modelPoints = points.Select(Map).ToList();
+            Guid listId = await _pointsService.AddNewList(modelPoints).ConfigureAwait(false);
+            _squaresService.CalculateSquares(modelPoints, listId).ConfigureAwait(false);
 
-            return Task.FromResult(_pointsService.AddNewList(modelPoints));
+            return listId;
         }
 
         [HttpPut("points/{listId}")]
-        public void AddPoint(int listId)
+        public async Task AddPoint(Guid listId, Point point)
         {
+            await _pointsService.AddPoint(listId, Map(point)).ConfigureAwait(false);
         }
 
         [HttpDelete("points/{listId}")]
-        public void RemovePoint(int listId)
+        public async Task RemovePoint(Guid listId, Point point)
         {
+            await _pointsService.RemovePoint(listId, Map(point)).ConfigureAwait(false);
         }
 
         private Models.Point Map(Point contractPoint)

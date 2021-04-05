@@ -9,6 +9,8 @@ namespace Services
 {
     public interface ISquaresService
     {
-        List<Square> GetSquares(List<Point> points);
+        Task<SquaresMetadata> GetSquares(Guid pointsListId);
+        Task CalculateSquares(List<Point> points, Guid pointsListId);
+        Task SaveSquares(Guid pointsListId, List<Square> squares);
     }
 }

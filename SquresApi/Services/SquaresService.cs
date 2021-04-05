@@ -1,21 +1,31 @@
-﻿using Models;
+﻿using System;
+using Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Mongo;
 
 namespace Services
 {
     public class SquaresService : ISquaresService
     {
-        public List<Square> GetSquares(List<Point> points)
+        private readonly SquaresRepository _squaresRepository;
+
+        public SquaresService(SquaresRepository squaresRepository)
+        {
+            _squaresRepository = squaresRepository;
+        }
+
+        public async Task CalculateSquares(List<Point> points, Guid pointsListId)
         {
             List<Square> squares = new List<Square>();
 
-            for(int i = 0; i <= points.Count - 3; i++)
+            for(int i = 0; i <= points.Count - 4; i++)
             {
-                for(int j = 1; j <= points.Count - 2; j++)
+                for(int j = 1; j <= points.Count - 3; j++)
                 {
-                    for (int k = 2; k <= points.Count - 1; k++)
+                    for (int k = 2; k <= points.Count - 2; k++)
                     {
-                        for (int l = 3; l <= points.Count; l++)
+                        for (int l = 3; l <= points.Count - 1; l++)
                         {
                             bool isSquare = CheckIfSquare(points[i], points[j], points[k], points[l]);
                             if (isSquare)
@@ -27,7 +37,29 @@ namespace Services
                 }
             }
 
-            return squares;
+            SquaresMetadata squaresMetadata = CreateMetadata(pointsListId, squares);
+            await _squaresRepository.Create(squaresMetadata).ConfigureAwait(false);
+        }
+
+        public async Task<SquaresMetadata> GetSquares(Guid pointsListId)
+        {
+            return await _squaresRepository.Find(pointsListId).ConfigureAwait(false);
+        }
+
+        public async Task SaveSquares(Guid pointsListId, List<Square> squares)
+        {
+            SquaresMetadata squaresMetadata = CreateMetadata(pointsListId, squares);
+            await _squaresRepository.Create(squaresMetadata).ConfigureAwait(false);
+        }
+
+        private SquaresMetadata CreateMetadata(Guid id, List<Square> squares)
+        {
+            return new SquaresMetadata
+            {
+                Id = id,
+                Squares = squares,
+                Count = squares.Count
+            };
         }
 
         private static int GetDistance(Point point1, Point point2)
